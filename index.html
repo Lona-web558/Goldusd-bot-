@@ -1,0 +1,266 @@
+<! DOCTYPE html>
+<html lang="en">
+  <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>GOLD/USD AI TRADING SYSTEM</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+     <style>
+         body{
+             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+             min-height: 100vh;
+             padding: 20px;
+         }
+         
+         .trading-container {
+             max-width: 900px;
+             margin: 0 auto;
+         }
+         
+         .card {
+             background: rgba(255,255,255,0.95);
+             border-radius: 15px;
+             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+             border: none;
+         }
+         
+         .card-header {
+             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+             border-radius: 15px 15px 0 0;
+             padding: 20px;
+             border: none;
+         }
+         
+         .stat-card {
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+             color: white;
+             border-radius: 10px;
+             padding: 20px;
+             margin-bottom: 15px;
+             transition: transform 0.3s;
+         }
+         
+         
+         .stat-card:hover {
+             transform: translateY(-5px);
+         }
+         
+         .stat-label {
+             font-size: 0.9rem;
+             opacity: 0.9;
+             margin-bottom: 5px;
+         }
+         
+         .stat-value {
+             font-size: 2rem;
+             font-weight: bold;
+         }
+         
+         
+         .price-display {
+             background: #f8f9fa;
+             border-radius: 10px;
+             padding: 15px;
+             margin-bottom: 20px;
+             border: 2px solid #ffd700;
+         }
+         
+         
+         .btn-start {
+             background: linear-gradient(135deg, #11998e 0%, #38efd7 100%);
+             border: none;
+             padding: 15px 40px;
+             font-size: 1.2rem;
+             font-weight: bold;
+             border-radius: 50px;
+             color: white;
+             transition: all 0.3s;
+         }
+         
+         .btn-start:hover {
+             transform: scale(1.05);
+             box-shadow: 0 5px 20px rgba(56,239,125,0.4);
+         }
+         
+         .btn-stop {
+             background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+             border: none;
+             padding: 15px 40px;
+             font-size: 1.2rem;
+             font-weight: bold;
+             border-radius: 50px;
+             color: white;
+             transition: all 0.3s;
+         }
+         
+         .btn-stop:hover {
+             transform: scale(1.05);
+             box-shadow: 0 5px 20px rgba(235,51,73,0.4);
+         }
+         
+         .trade-log {
+             max-height: 300px;
+             overflow-y: auto;
+             background: #f8f9fa;
+             border-radius: 10px;
+             padding: 15px;
+         }
+         
+         .chart-container {
+             background: #f8f9fa;
+             border-radius: 10px;
+             padding: 20px;
+             margin-bottom: 20px;
+             border: 2px solid #dee2e6;
+         }
+         
+         .trade-entry {
+             padding: 10px;
+             margin-bottom: 10px;
+             border-radius: 5px;
+             border-left: 4px solid;
+         }
+         
+         .trade-win {
+             background: #d4edda;
+             border-left-color: #28a745;
+         }
+         
+         .trade-loss {
+             background: #f8d7da;
+             border-left-color: #dc3545;
+         }
+         
+         .status-indicator {
+             display: inline-block;
+             width: 12px;
+             height: 12px;
+             border-radius: 50%;
+             margin-right: 8px;
+         }
+         
+         .status-active {
+             background: #28a745;
+             animation: pulse 1.5s infinite;
+         }
+         
+         .status:inactive {
+             background: #6c757d;
+         }
+         
+         @keyframes pulse {
+             0% 100%{
+                 opacity: 1;
+             }
+             50% {
+                 opacity: 0.5;
+             }
+         }
+         
+     </style>
+  </head>  
+  <body>
+      
+      <div class="trading-container">
+         <div class="card">
+             <div class="card-header text-center">
+                 <h1 class="mb-0"><i class="bi bi-coin"></i>GOLD/USD AI BOT</h1>
+                 <p class="mb-0 text-muted">AI Trading System</p>
+             </div>
+             <div class="card-body">
+                 <div class="price-display text-center">
+                     <h5 class="mb-2">CURRENT GOLD PRICE</h5>
+                     <h2 class="text-primary mb-0">$<span id="currentPrice">2045.50</span></h2>
+                     <small class="text-muted">Per Troy Ounce</small>
+                 </div>
+                 
+                 <div class="row mb-4">
+                     <div class="col-md-4">
+                         <div class="stat-card">
+                             <div class="stat-label">
+                                 WIN RATE
+                             </div>
+                             <div class="stat-value">
+                                 <span id="winRate">0</span>%
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <div class="col-md-4">
+                         <div class="stat-card">
+                             <div class="stat-label">
+                                 TOTAL TRADES
+                             </div>
+                             <div class="stat-value" id="totalTrades">0</div>
+                         </div>
+                     </div>
+                     
+                     <div class="col-md-4">
+                         <div class="stat-card">
+                             <div class="stat-label">TOTAL PROFIT</div>
+                             <div class="stat-value">
+                                 $<span id="totalProfit">0.00</span>
+                             </div>
+                         </div>
+                     </div>
+                     
+                 </div>
+                 
+                 <div class="chart-container">
+                     <h6 class="mb-3">GOLD PRICE CHART</h6>
+                     <canvas id="priceChart"></canvas>
+                 </div>
+              
+              
+              <div class="text-center mb-4">
+                  <div class="mb-3">
+                      <span class="status-indicator" id="statusIndicator"></span>
+                      <span id="statusText">Bot Inactive</span>
+                      
+                  </div>
+                  
+                  <button class="btn btn-start" id ="startBtn" onclick="toggleBot()">START BOT</button>
+              </div>
+              
+              <div class="trade-log" id="tradeLog">
+                <h6 class="mb-3">TRADE HISTORY</h6> 
+                <p class="text-muted text-center">No trades yet. Start the bot to begin trading.</p>
+              </div>
+                 
+             </div>
+             
+         </div>
+          
+      </div>
+      
+      <div>
+         BALANCE: $<span id="balance"></span>
+      </div>
+      
+      <div class="col-md-4">
+          <div class="wallet-section">
+              <h5><i class="fas fa-wallet"></i>Wallet management</h5>
+              <div class="mb-3">
+                  <label class="form-label">Deposit Amount</label>
+                  <input type="number" id="depositAmount" class="form-control" placeholder="Enter amount" min="1">
+                  <button onclick="deposit()" class="btn btn-light w-100 mt-2">
+                      <i class="fas fa-arrow-down"></i>Deposit
+                  </button>
+              </div>
+              
+              
+              <div>
+                  <label class="form-label">Withdraw Amount</label>
+                  <input type="number" id="withdrawAmount" class="form-control" placeholder="Enter Amount" min=="1">
+                  <button onclick="withdraw()" class="btn btn-light w-100 mt-2">
+                      <i class="fas fa-arrow-up"></i>Withdraw
+                  </button>
+                  
+              </div>
+          </div>
+      </div>
+      
+      
+      <script src="script1.js"></script>
+  </body>
+</html>
